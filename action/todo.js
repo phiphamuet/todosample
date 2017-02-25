@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const uuid = require('uuid');
-var mocks = [];
 
 module.exports = (app) => {
     const Todo = app.db.mongo.models.Todo;
@@ -30,29 +29,33 @@ module.exports = (app) => {
                 done(null, newTodo)
             )
         },
-        updateTodo: ({id, payload}, done) => {
+        updateTodo: ({id, payload, author}, done) => {
             Todo.find({_id: id})
-                .then(result =>
-                    Todo.update({_id: id}, {...payload})
-                )
-                .then(updated =>
-                    done(null, {
-                        _id: id,
-                        ...payload
-                    })
-                )
+                .then(result => {
+                    if (result[0].author != author)
+                        return done(null);
+                    return Todo.update({_id: id}, {...payload})
+                        .then(updated =>
+                            done(null, {
+                                _id: id,
+                                ...payload
+                            })
+                        );
+                })
                 .catch(err =>
                     done(null)
                 )
         },
-        deleteTodo: ({id}, done) =>
+        deleteTodo: ({id, author}, done) =>
             Todo.find({_id: id})
-                .then(result =>
-                    Todo.remove({_id: id})
+                .then(result => {
+                    if (result[0].author !== author)
+                        return done(null);
+                    return Todo.remove({_id: id})
                     .then(removed =>
                         done(null, result[0])
                     )
-                )
+                })
                 .catch(err =>
                     done(null)
                 )

@@ -7,25 +7,42 @@ module.exports = (app) => {
                 handler: todoHandler.findTodo,
                 authenticate: {
                     name: 'secondJWT',
-                    permissions: ['todo_manage'],
+                    permissions: ['manage_own_todo'],
                     option: {}
                 }
             }
         },
         "/:id": {
             get: {
-                handler: todoHandler.findTodoById
+                handler: todoHandler.findTodoById,
+                authenticate: {
+                    name: 'secondJWT',
+                    permissions: ['manage_own_todo']
+                }
             },
             put: {
-                handler: todoHandler.updateTodo
+                handler: todoHandler.updateTodo,
+                authenticate: {
+                    name: 'secondJWT',
+                    permissions: ['manage_own_todo']
+                }
             },
             delete: {
-                handler: todoHandler.deleteTodo
+                handler: todoHandler.deleteTodo,
+                authenticate: {
+                    name: 'secondJWT',
+                    permissions: ['manage_own_todo'],
+                    option: {}
+                }
             }
         },
         "/create": {
             post: {
-                handler: todoHandler.createTodo
+                handler: todoHandler.createTodo,
+                authenticate: {
+                    name: 'secondJWT',
+                    permissions: ['manage_own_todo']
+                }
             }
         },
         "/cors/:id([0-9]+)": {

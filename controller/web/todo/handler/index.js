@@ -1,10 +1,11 @@
 module.exports = app => ({
     findTodo: async (req, res) => {
-        console.log(req.user);
-        let limit = req.body.limit || 10,
-            page = req.body.page || 1,
-            offset = 0,
-            author = req.user.username;
+        let {
+            limit = 10,
+            page = 1,
+            offset = 0
+        } = req.body;
+        let author = req.user._id;
         if (page > 1)
             offset = (page - 1) * limit;
 
@@ -20,8 +21,9 @@ module.exports = app => ({
     },
 
     findTodoById: async (req, res) => {
+        const author = req.user._id;
         const result = await app.seneca.exec({
-            role: 'todo', cmd: 'findTodoById', id: req.params.id
+            role: 'todo', cmd: 'findTodoById', id: req.params.id, author
         });
 
         if (result)
@@ -37,11 +39,13 @@ module.exports = app => ({
     },
 
     createTodo: async (req, res) => {
+        const author = req.user._id;
+        const { text = '', complete = false } = req.body;
         const result = await app.seneca.exec({
             role: 'todo', cmd: 'createTodo', payload: {
-                author: req.body.author,
-                text: req.body.text,
-                complete: req.body.complete
+                author,
+                text,
+                complete
             }
         });
         return res.jsonp({
@@ -52,13 +56,15 @@ module.exports = app => ({
     },
 
     updateTodo: async (req, res) => {
+        const author = req.user._id;
+        const { text, complete } = req.body;
         const result = await app.seneca.exec({
             role: 'todo', cmd: 'updateTodo', id: req.params.id,
             payload: {
-                author: req.body.author,
-                text: req.body.text,
-                complete: req.body.complete
-            }
+                text: text,
+                complete: complete
+            },
+            author
         });
 
         if (result)
@@ -70,13 +76,14 @@ module.exports = app => ({
 
         return res.jsonp({
             status: 401,
-            message: 'khong tim thay todo voi id: ' + req.params.id
+            message: 'You do not have to do with id: ' + req.params.id
         });
     },
 
     deleteTodo: async (req, res) => {
+        const author = req.user._id;
         const result = await app.seneca.exec({
-            role: 'todo', cmd: 'deleteTodo', id: req.params.id
+            role: 'todo', cmd: 'deleteTodo', id: req.params.id, author
         });
 
         if (result)
