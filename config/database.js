@@ -3,10 +3,14 @@
  */
 
 /* Load Database connections */
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+const connection = mongoose.connect('mongodb://localhost/circle');
+
 exports.beforeInitialize = (app) => {
     const models = {
         // postgres: sequelize,
-        // mongo: mongoose
+        mongo: connection
     };
     return Promise.resolve().then(() => models);
 };

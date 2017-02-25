@@ -31,6 +31,7 @@ module.exports = (app) => {
             const sample = _.find(samples, {id});
             if (!sample)
                 return done(null);
+
             const index = _.indexOf(samples, sample);
 
             // Replace item at index using native splice
